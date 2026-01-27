@@ -18,6 +18,6 @@ data "azurerm_management_group" "lz" {
 # (Lookup by MG name is supported; you get the MG resource id for use as scope.) [3](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
 
 module "landingzone_rbac" {
-  source             = "../../modules/landingzone-rbac"
+  source             = "../../modules/landingzone-core"
   mg_landingzones_id = data.azurerm_management_group.lz.id
 }
