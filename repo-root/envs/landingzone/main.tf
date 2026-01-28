@@ -1,14 +1,20 @@
 # envs/landingzone/main.tf
 
 variable "parent_mg_id" {
-  description = "Resource ID of the parent MG (Tenant Root)."
+  description = "Resource ID of the parent Management Group (Tenant Root)."
   type        = string
 }
 
-module "landingzones" {
+# Optionally override mg name if you wish later
+# variable "mg_name" {
+#   type    = string
+#   default = "mg-landingzone"
+# }
+
+module "landingzone" {
   source       = "../../modules/landingzone"
   parent_mg_id = var.parent_mg_id
 
-  # Optional: change the mg name if you prefer
-  # mg_name = "mg-landingzone"
+  # If you ever want to pass a different name:
+  # mg_name = var.mg_name
 }

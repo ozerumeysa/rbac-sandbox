@@ -9,14 +9,14 @@ terraform {
 # Inputs
 
 variable "parent_mg_id" {
-  description = "Resource ID of the parent MG (Tenant Root)."
+  description = "Resource ID of the parent Management Group (Tenant Root)."
   type        = string
 }
 
 variable "mg_name" {
-  description = "Name for the Landing Zones MG."
+  description = "Name for the Landing Zone MG (singular)."
   type        = string
-  default     = "mg-landingzone"
+  default     = "mg-landingzone"   # <-- singular as requested
 }
 
 
@@ -27,7 +27,6 @@ resource "azurerm_management_group" "lz" {
   display_name               = var.mg_name
   parent_management_group_id = var.parent_mg_id
 }
-# Management groups are created/nested via azurerm_management_group. [1](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
 
 
 # Entra (AAD) security groups
@@ -45,8 +44,6 @@ resource "azuread_group" "lz" {
   security_enabled        = true
   prevent_duplicate_names = true
 }
-# Entra security groups are created via azuread_group. [2](https://shisho.dev/dojo/providers/azurerm/Management/azurerm-management-group/)
-
 
 # RBAC for Landing Zone personas
 
@@ -71,7 +68,6 @@ resource "azurerm_role_assignment" "lz_assign" {
   role_definition_name = each.value.role
   principal_id         = azuread_group.lz[each.value.group].object_id
 }
-# RBAC assignments use azurerm_role_assignment with scope, role_definition_name, principal_id. [3](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/considerations/landing-zone-governance)
 
 
 # Outputs

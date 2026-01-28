@@ -12,7 +12,7 @@ terraform {
     }
   }
 
-  backend "local" {}
+  backend "local" {}  # portable for any PC
 }
 
 provider "azurerm" {
