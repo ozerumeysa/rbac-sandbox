@@ -8,10 +8,12 @@ terraform {
 
 # Inputs
 
-variable "parent_mg_name" {
-  description = "Name (not display name) of the parent MG (e.g., your Intermediate Root MG name)."
+
+variable "parent_mg_id" {
+  description = "Full resource ID of the parent Management Group."
   type        = string
 }
+
 
 variable "mg_names" {
   description = "Names for the Platform MGs"
@@ -29,21 +31,14 @@ variable "mg_names" {
   }
 }
 
-
-# Parent MG lookup
-
-data "azurerm_management_group" "parent" {
-  name = var.parent_mg_name
-} # Lookup by MG name is supported. [1](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
-
-
 # Create Platform MG hierarchy
+
 
 resource "azurerm_management_group" "platform" {
   name                       = var.mg_names.platform
   display_name               = var.mg_names.platform
-  parent_management_group_id = data.azurerm_management_group.parent.id
-} # MG creation via azurerm_management_group. [1](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
+  parent_management_group_id = var.parent_mg_id
+}
 
 resource "azurerm_management_group" "identity" {
   name                       = var.mg_names.identity
