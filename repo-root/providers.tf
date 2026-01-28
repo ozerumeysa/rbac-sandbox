@@ -1,3 +1,5 @@
+// repo-root/providers.tf (or repo-root/global/providers.tf)
+
 terraform {
   required_version = ">= 1.6.0"
 
@@ -12,15 +14,12 @@ terraform {
     }
   }
 
-  # Local backend keeps it portable; later we can use Azure Storage
+  // Keep local backend initially so it runs on any PC.
   backend "local" {}
 }
 
 provider "azurerm" {
-  features {}
-  # no secrets needed for local runs (uses your az login)
+  features {}  // <-- REQUIRED
 }
 
-provider "azuread" {
-  # uses your Azure CLI context / device login by default
-}
+provider "azuread" {}
