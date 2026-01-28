@@ -16,11 +16,11 @@ variable "parent_mg_id" {
 variable "mg_name" {
   description = "Name for the Landing Zones MG."
   type        = string
-  default     = "mg-landingzones"
+  default     = "mg-landingzone"
 }
 
 
-# Create mg-landingzones under Tenant Root
+# Create mg-landingzone under Tenant Root
 
 resource "azurerm_management_group" "lz" {
   name                       = var.mg_name
@@ -76,7 +76,7 @@ resource "azurerm_role_assignment" "lz_assign" {
 
 # Outputs
 
-output "mg_landingzones_id" { value = azurerm_management_group.lz.id }
+output "mg_landingzone_id" { value = azurerm_management_group.lz.id }
 
 output "group_ids" {
   value = { for k, g in azuread_group.lz : k => g.object_id }

@@ -6,9 +6,9 @@ variable "parent_mg_id" {
 }
 
 module "landingzones" {
-  source       = "../../modules/landingzones"
+  source       = "../../modules/landingzone"
   parent_mg_id = var.parent_mg_id
 
   # Optional: change the mg name if you prefer
-  # mg_name = "mg-landingzones"
+  # mg_name = "mg-landingzone"
 }
