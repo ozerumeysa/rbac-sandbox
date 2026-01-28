@@ -1,5 +1,3 @@
-// repo-root/providers.tf (or repo-root/global/providers.tf)
-
 terraform {
   required_version = ">= 1.6.0"
 
@@ -14,12 +12,12 @@ terraform {
     }
   }
 
-  // Keep local backend initially so it runs on any PC.
+  # Keep local backend for now so anyone can run from any PC
   backend "local" {}
 }
 
 provider "azurerm" {
-  features {}  // <-- REQUIRED
+  features {}  # REQUIRED by the azurerm provider
 }
 
 provider "azuread" {}
