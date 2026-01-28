@@ -4,12 +4,16 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.114"
+      version = "~> 4.57"
     }
     azuread = {
       source  = "hashicorp/azuread"
       version = "~> 3.7"
     }
+    time    = {
+      source = "hashicorp/time"
+      version = "~> 0.9" 
+      }
   }
 
   # Keep local state so anyone can run on their PC

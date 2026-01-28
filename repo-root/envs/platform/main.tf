@@ -10,6 +10,12 @@ module "platform" {
   source        = "../../modules/platform"
   parent_mg_id  = var.parent_mg_id
 
+  
+  pim_approver_group_object_id      = var.pim_approver_group_object_id
+  platform_policy_initiative_id     = var.platform_policy_initiative_id
+  connectivity_policy_initiative_id = var.connectivity_policy_initiative_id
+
+
   # Optional: override default MG names if you want different ones
   # mg_names = {
   #   platform     = "mg-platform"
