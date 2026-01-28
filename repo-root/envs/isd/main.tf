@@ -1,18 +1,10 @@
-terraform {
-  required_providers {
-    azurerm = { source = "hashicorp/azurerm" }
-    azuread = { source = "hashicorp/azuread" }
-  }
+variable "landingzone_mg_id" {
+  description = "Resource ID of mg-landingzone (parent scope for ISD)."
+  type        = string
 }
 
-# Resolve mg-landingzones by name to get its ID
-variable "mg_landingzones_name" { type = string, default = "mg-landingzones" }
-
-data "azurerm_management_group" "lz" {
-  name = var.mg_landingzones_name
-} # Uses azurerm_management_group data source to fetch the MG id. [3](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
-
-module "isd_rbac" {
-  source            = "../../modules/isd-core"
-  landingzones_mg_id = data.azurerm_management_group.lz.id
+module "isd" {
+  source           = "../../modules/isd"
+  parent_mg_id     = var.landingzone_mg_id
+  isd_mg_name      = "mg-landingzone-ISD"   # keep default; change if you need
 }
