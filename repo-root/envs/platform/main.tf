@@ -10,9 +10,6 @@ module "platform" {
   source        = "../../modules/platform"
   parent_mg_id  = var.parent_mg_id
 
-  
-  pim_approver_group_object_id      = var.pim_approver_group_object_id
-
 
 
   # Optional: override default MG names if you want different ones
