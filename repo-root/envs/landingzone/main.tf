@@ -1,23 +1,14 @@
-terraform {
-  required_providers {
-    azurerm = { source = "hashicorp/azurerm" }
-    azuread = { source = "hashicorp/azuread" }
-  }
-}
+# envs/landingzone/main.tf
 
-# If you know the MG name and want to look up its ID:
-variable "mg_landingzones_name" {
-  description = "Name (not display name) of mg-landingzones"
+variable "parent_mg_id" {
+  description = "Resource ID of the parent MG (Tenant Root)."
   type        = string
-  default     = "mg-landingzones"
 }
 
-data "azurerm_management_group" "lz" {
-  name = var.mg_landingzones_name
-}
-# (Lookup by MG name is supported; you get the MG resource id for use as scope.) [3](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
+module "landingzones" {
+  source       = "../../modules/landingzones"
+  parent_mg_id = var.parent_mg_id
 
-module "landingzone_rbac" {
-  source             = "../../modules/landingzone-core"
-  mg_landingzones_id = data.azurerm_management_group.lz.id
+  # Optional: change the mg name if you prefer
+  # mg_name = "mg-landingzones"
 }

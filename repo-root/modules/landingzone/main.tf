@@ -5,15 +5,33 @@ terraform {
   }
 }
 
-# 0) INPUTS
 
-variable "mg_landingzones_id" {
-  description = "Resource ID of mg-landingzones management group"
+# Inputs
+
+variable "parent_mg_id" {
+  description = "Resource ID of the parent MG (Tenant Root)."
   type        = string
 }
 
+variable "mg_name" {
+  description = "Name for the Landing Zones MG."
+  type        = string
+  default     = "mg-landingzones"
+}
 
-# 1) CREATE ENTRA GROUPS
+
+# Create mg-landingzones under Tenant Root
+
+resource "azurerm_management_group" "lz" {
+  name                       = var.mg_name
+  display_name               = var.mg_name
+  parent_management_group_id = var.parent_mg_id
+}
+# Management groups are created/nested via azurerm_management_group. [1](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
+
+
+# Entra (AAD) security groups
+
 locals {
   lz_groups = {
     owner  = "LandingZone-Owner"
@@ -27,44 +45,39 @@ resource "azuread_group" "lz" {
   security_enabled        = true
   prevent_duplicate_names = true
 }
-# (Creates standard Entra security groups suitable for Azure RBAC.) [1](https://shisho.dev/dojo/providers/azurerm/Management/azurerm-management-group/)
+# Entra security groups are created via azuread_group. [2](https://shisho.dev/dojo/providers/azurerm/Management/azurerm-management-group/)
 
 
-# 2) RBAC ASSIGNMENTS AT mg-landingzones
+# RBAC for Landing Zone personas
 
 locals {
-  # Owner permissions (infra + ops), Reader (visibility)
   lz_rbac = [
-    # LandingZone-Owner
+    # Owner
     { group = "owner",  role = "Contributor" },
     { group = "owner",  role = "EventGrid Contributor" },
     { group = "owner",  role = "Log Analytics Contributor" },
     { group = "owner",  role = "Monitoring Contributor" },
     { group = "owner",  role = "Tag Contributor" },
 
-    # LandingZone-Reader
+    # Reader
     { group = "reader", role = "Reader" }
   ]
 }
 
 resource "azurerm_role_assignment" "lz_assign" {
-  for_each = {
-    for idx, item in local.lz_rbac : idx => item
-  }
+  for_each = { for idx, item in local.lz_rbac : idx => item }
 
-  scope                = var.mg_landingzones_id
+  scope                = azurerm_management_group.lz.id
   role_definition_name = each.value.role
   principal_id         = azuread_group.lz[each.value.group].object_id
 }
-# (Role assignment is done with azurerm_role_assignment using scope, role_definition_name, principal_id.) [2](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/considerations/landing-zone-governance)
+# RBAC assignments use azurerm_role_assignment with scope, role_definition_name, principal_id. [3](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/considerations/landing-zone-governance)
 
 
-# 3) OUTPUTS
+# Outputs
+
+output "mg_landingzones_id" { value = azurerm_management_group.lz.id }
 
 output "group_ids" {
   value = { for k, g in azuread_group.lz : k => g.object_id }
-}
-
-output "mg_landingzones_id" {
-  value = var.mg_landingzones_id
 }
