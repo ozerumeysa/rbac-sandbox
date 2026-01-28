@@ -6,7 +6,7 @@ data "azurerm_management_group" "isd" {
 }
 
 # 2) Deploy a project (change only project_code)
-module "project_eur" {
+module "project" {
   source       = "../../../modules/project"
   project_code = "edc"  # <-- change this for each new project
   parent_mg_id = data.azurerm_management_group.isd.id
