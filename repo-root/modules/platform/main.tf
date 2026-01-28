@@ -8,15 +8,13 @@ terraform {
 
 # Inputs
 
-
 variable "parent_mg_id" {
   description = "Full resource ID of the parent Management Group."
   type        = string
 }
 
-
 variable "mg_names" {
-  description = "Names for the Platform MGs"
+  description = "Names for the Platform management groups"
   type = object({
     platform     = string
     identity     = string
@@ -31,14 +29,15 @@ variable "mg_names" {
   }
 }
 
-# Create Platform MG hierarchy
 
+# Create Platform MG hierarchy
 
 resource "azurerm_management_group" "platform" {
   name                       = var.mg_names.platform
   display_name               = var.mg_names.platform
   parent_management_group_id = var.parent_mg_id
 }
+# Creating/nesting management groups is done with azurerm_management_group. [2](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
 
 resource "azurerm_management_group" "identity" {
   name                       = var.mg_names.identity
@@ -79,9 +78,11 @@ resource "azuread_group" "platform" {
   description             = "Platform persona group: ${each.value}"
   security_enabled        = true
   prevent_duplicate_names = true
-} # Creates Entra security groups. [2](https://shisho.dev/dojo/providers/azurerm/Management/azurerm-management-group/)
+}
+# Entra security groups are created via azuread_group. [3](https://shisho.dev/dojo/providers/azurerm/Management/azurerm-management-group/)
 
-# RBAC matrix 
+
+# RBAC matrix (simple & clear)
 
 locals {
   # mg-platform
@@ -106,7 +107,7 @@ locals {
   rbac_management = [
     { group = "platform_mgmt_admins",     role = "Contributor",                                   scope = azurerm_management_group.management.id },
     { group = "platform_mgmt_arc_admins", role = "Azure Connected Machine Resource Administrator", scope = azurerm_management_group.management.id }
-    # DevCenter Admins are usually assigned at Dev Center/Project scope later
+    # DevCenter Admins typically assigned later at Dev Center/Project scope
   ]
 
   rbac_all = concat(local.rbac_platform, local.rbac_identity, local.rbac_connectivity, local.rbac_management)
@@ -118,7 +119,9 @@ resource "azurerm_role_assignment" "platform" {
   scope                = each.value.scope
   role_definition_name = each.value.role
   principal_id         = azuread_group.platform[each.value.group].object_id
-} # Role assignment at MG scope via azurerm_role_assignment. [3](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/considerations/landing-zone-governance)
+}
+# RBAC assignments are done with azurerm_role_assignment using scope, role_definition_name, principal_id. [4](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/considerations/landing-zone-governance)
+
 
 # Outputs
 

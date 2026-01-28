@@ -1,21 +1,16 @@
-terraform {
-  required_version = ">= 1.6.0"
-}
 
-# Load shared providers (keeps code DRY and portable)
-# You can symlink or copy from ../global/providers.tf if needed
-# Or simply run from repo-root so Terraform loads it automatically.
+# Variables
 
-variable "parent_mg_name" {
-  description = "Name of the parent management group (e.g., Intermediate Root MG name)"
+variable "parent_mg_id" {
+  description = "Resource ID of the parent Management Group"
   type        = string
 }
 
 module "platform" {
-  source         = "../../modules/platform"
-  parent_mg_name = var.parent_mg_name
+  source        = "../../modules/platform"
+  parent_mg_id  = var.parent_mg_id
 
-  # Optional: override names
+  # Optional: override default MG names if you want different ones
   # mg_names = {
   #   platform     = "mg-platform"
   #   identity     = "mg-platform-identity"

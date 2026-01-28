@@ -12,12 +12,14 @@ terraform {
     }
   }
 
-  # Keep local backend for now so anyone can run from any PC
+  # Keep local state so anyone can run on their PC
   backend "local" {}
 }
 
+# Azure Resource Manager provider (REQUIRED: features {})
 provider "azurerm" {
-  features {}  # REQUIRED by the azurerm provider
+  features {}
 }
 
+# Entra ID (Azure AD) provider
 provider "azuread" {}
