@@ -1,18 +1,13 @@
-# envs/projects/edc/main.tf
+# envs/projects/eur/main.tf
 
-variable "parent_mg_id" {
-  description = "Resource ID of the parent MG (ISD), e.g. /providers/Microsoft.Management/managementGroups/mg-landingzone-ISD"
-  type        = string
+# 1) Look up ISD MG by Group ID (name)
+data "azurerm_management_group" "isd" {
+  name = "mg-landingzone-ISD"
 }
 
-variable "project_code" {
-  description = "Short code for the project (used in names), e.g., EUROM"
-  type        = string
-  default     = "edc"
-}
-
-module "project" {
-  source        = "../../../modules/project"
-  parent_mg_id  = var.parent_mg_id
-  project_code  = var.project_code
+# 2) Deploy a project (change only project_code)
+module "project_eur" {
+  source       = "../../../modules/project-rbac"
+  project_code = "edc"  # <-- change this for each new project
+  parent_mg_id = data.azurerm_management_group.isd.id
 }

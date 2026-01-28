@@ -16,7 +16,7 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}  # REQUIRED by the AzureRM provider
+  features {}
 }
 
 provider "azuread" {}
